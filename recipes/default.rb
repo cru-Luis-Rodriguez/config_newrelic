@@ -10,8 +10,8 @@
 CAS_dir = node['tomcat-cas']['install_path']
 
 directory "#{CAS_dir}/temp" do
-    owner "appadmin"
-    group "appadmin"
+    owner "node['newrelic']['java_agent']['app_user']"
+    group "node['newrelic']['java_agent']['app_user']"
     mode "0755"
     action :create
 end
