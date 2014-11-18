@@ -1,0 +1,10 @@
+#!/bin/bash
+<%= @path_pia %>./stopPIA.sh
+sleep 10
+echo "PIA Stopped"
+rm -rf <%= @pia_cache %>/cache/*
+sleep 20
+echo "Deleted cache"
+echo "Starting PIA"
+<%= @path_pia %>./startPIA.sh
+echo "PIA Started"

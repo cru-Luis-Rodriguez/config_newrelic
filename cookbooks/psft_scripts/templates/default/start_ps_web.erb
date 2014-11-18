@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# peoplesoft
+#
+# chkconfig: 2345 20 80
+# description:  Start up peoplesoft  engine.
+
+# Source function library.
+. /etc/init.d/functions
+
+RETVAL=$?
+case "$1" in
+ start)
+            /bin/su - wladmin /pshome/psft_jenkins_scripts/ps.sh start
+;;
+ stop)
+
+           /bin/su - wladmin /pshome/psft_jenkins_scripts/ps.sh stop
+
+;;
+
+ restart)
+
+            /bin/su - wladmin /pshome/psft_jenkins_scripts/ps.sh restart
+;;
+ *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac
+
+exit $RETVAL

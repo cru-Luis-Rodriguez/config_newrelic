@@ -1,0 +1,126 @@
+#!/bin/bash
+#deployed and managed thru chef.cru.org -Luis Rodriguez
+#Purpose:  This script starts and stops all of the the process schedulers, app servers, and web servers defined in an environment
+#Usage:  ps.sh <command> [cc]
+# where <command> is one of the following:
+#      start - Starts all web/
+#      stop - Stops all web/
+#      kill - Kills all web/
+#      restart - Executes the Stop then the Start commands
+# If cc is specified on the command line, cache will be cleared for the web.
+
+#variables
+PIA1=''
+PIA2=''
+domain=''
+domain1=''
+domain2=''
+action=$1
+
+#Check for valid  start/stop/kill parameters
+if [ "X$action" != "Xstart" ] && [ "X$action" != "Xstop" ] && [ "X$action" != "Xkill" ] && [ "X$action" != "Xrestart" ]
+then
+   echo "usage: ps.sh start|stop|kill|restart [cc]"
+   exit
+fi
+
+#Try to invoke psconfig.sh if it's not already loaded
+
+if [ "$IS_PS_PLT" = "Y" ]
+then
+     echo OK > /dev/null
+else
+     echo 'Warning:  psconfig.sh has not been invoked.'
+     psconfig=`find <%= @ps_home %>/<%= @app %>/<%= @env %> -name psconfig.sh -user $LOGNAME -print 2>/dev/null | grep -v AppBat`
+     echo "Invoking " $psconfig
+     . $psconfig
+fi
+
+# If you want to restart, call the script once to stop, and a second time to restart.
+if [ "X$action" = "Xrestart" ]
+then
+   ps.sh stop $2; ps.sh start
+   exit
+fi
+
+#Set the equivalent start/stop/kill parameters for the application server & web server
+websrv_action=$action
+
+case $action in
+ "start") :
+    ;;
+ "stop") :
+    ;;
+ "kill") :
+    websrv_action="stop"
+    ;;
+esac
+
+clearcache=$2
+if [ "X$clearcache" = "Xcc" ]
+then
+   clearcache="Y"
+else
+   clearcache="N"
+fi
+
+domain=$(find <%= @ps_home %>/<%= @app %> -name config.xml -print | grep -v Archive | grep -v servers | grep -v cg | grep -v demo | cut -f 7 -d "/")
+echo $domain
+domain1=$(find <%= @ps_home %>/<%= @app %> -name config.xml -print | grep -v $domain | grep -v servers | grep -v demo| cut -f 7 -d "/")
+echo $domain1
+domain2=$(find <%= @ps_home %>/<%= @app %> -name config.xml -print | grep -v $domain | grep -v $domain1 | grep -v servers | cut -f 7 -d "/")
+echo $domain2
+
+PIA1='<%= @ps_home %>/<%= @app %>/<%= @env %>/webserv/'
+PIA2='<%= @ps_home %>/<%= @app %>/demo/webserv/'
+
+#perform the action on the web server (if one is installed)
+    if [ x$domain != 'x' ]
+    then
+       if [ "$action" = "start" ] && [ "$clearcache" = "Y" ]
+       then
+          echo Clearing $domain web server cache
+          rm $PIA1$domain/applications/peoplesoft/PORTAL.war/$domain/cache/*
+          if [ "x$domain1" != "x" ]
+          then
+             echo Clearing $domain1 web server cache
+             rm $PIA1$domain1/applications/peoplesoft/PORTAL.war/$domain1/cache/*
+          fi
+          if [ "x$domain2" != "x" ]
+          then
+             echo Clearing $domain2 web server cache
+             rm $PIA2$domain2/applications/peoplesoft/PORTAL.war/$domain2/cache/*
+          fi
+       fi
+       echo "$action"ing $domain Web Server
+       /$PIA1$domain/bin/"$websrv_action"PIA.sh
+       if [ "x$domain1" != "x" ]
+          then
+             echo "$action"ing $domain1 Web Server
+             /$PIA1$domain1/bin/"$websrv_action"PIA.sh
+       fi
+       if [ "x$domain2" != "x" ]
+          then
+             echo "$action"ing $domain2 Web Server
+             /$PIA2$domain2/bin/"$websrv_action"PIA.sh
+       fi
+
+
+       if [ "$action" != "start" ] && [ "$clearcache" = "Y" ]
+       then
+          echo Clearing $domain web server cache
+          rm $PIA1$domain/applications/peoplesoft/PORTAL.war/$domain/cache/*
+          
+          if [ "x$domain1" != "x" ]
+             then
+             echo Clearing $domain1 web server cache
+             rm $PIA1$domain1/applications/peoplesoft/PORTAL.war/$domain1/cache/*
+          fi
+          if [ "x$domain2" != "x" ]
+             then
+             echo Clearing $domain2 web server cache
+             rm $PIA2$domain2/applications/peoplesoft/PORTAL.war/$domain2/cache/*
+          fi
+       fi
+    fi
+

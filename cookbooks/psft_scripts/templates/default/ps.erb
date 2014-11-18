@@ -1,0 +1,151 @@
+#!/bin/bash
+#
+#Purpose:  This script starts and stops all of the the process schedulers, app servers, and web servers defined in an environment
+#Usage:  ps.sh <command> [cc]
+# where <command> is one of the following:
+#      start - Starts all web/app/process scheduler/PSEMAgents
+#      stop - Stops all web/app/process scheduler/PSEMAgents
+#      kill - Kills all web/app/process scheduler/PSEMAgents, and cleans up IPCS
+#      restart - Executes the Stop then the Start commands
+# If cc is specified on the command line, cache will be cleared for the web, app server, process scheduler, and PSEMAgent, 
+#    and the app server and process scheduler will be reconfigured.
+#Check for valid process scheduler start/stop/kill parameters
+
+action=$1
+if [ "X$action" != "Xstart" ] && [ "X$action" != "Xstop" ] && [ "X$action" != "Xkill" ] && [ "X$action" != "Xrestart" ] && [ "X$action" != "Xsstatus" ]
+then
+   echo "usage: ps.sh start|stop|kill|restart [cc]"
+   exit
+fi
+
+#Try to invoke psconfig.sh if it's not already loaded
+#Change PSHighLevelDirectory to your PS_BASE or PS_HOME directory.
+if [ "$IS_PS_PLT" = "Y" ]
+then
+     echo OK > /dev/null
+else
+     echo 'Warning:  psconfig.sh has not been invoked.'
+     psconfig=`find /pshome/psoft/<%= @app %> -name psconfig.sh -user $LOGNAME -print 2>/dev/null`
+     echo "Invoking " $psconfig
+     . $psconfig
+fi
+
+# If you want to restart, call the script once to stop, and a second time to restart.
+if [ "X$action" = "Xrestart" ]
+then
+   ps.sh stop $2; ps.sh start
+   exit
+fi
+
+#Set the equivalent start/stop/kill parameters for the application server & web server
+websrv_action=$action
+
+case $action in
+ "start") :
+    appsrv_action="boot"
+    emagent_action="Start"
+    ;;
+ "stop") :
+    appsrv_action="shutdown"
+    emagent_action="Stop"
+    ;;
+ "kill") :
+    appsrv_action="shutdown!"
+    websrv_action="stop"
+    emagent_action="Stop"
+    ;;
+ "sstatus") :
+    appsrv_action="sstatus"
+esac
+
+clearcache=$2
+if [ "X$clearcache" = "Xcc" ]
+then
+   clearcache="Y"
+else
+   clearcache="N"
+fi
+
+#Perform the action on the process scheduler (if one is defined)
+cd <%= @cg_home %>/appserv
+for domain in $(find ./ -name psprcs.cfg -print | grep -v Archive | cut -f 3 -d "/");do
+     if [ "X$domain" != "X" ]
+     then
+        if [ "$action" = "start" ] && [ "$clearcache" = "Y" ]
+        then
+           echo Clearing $domain process scheduler cache
+           rm -r $PS_HOME/appserv/prcs/$domain/CACHE/*
+           echo Reconfiguring $domain
+           psadmin -p configure -d $domain
+        fi
+        echo "$action"ing $domain Process Scheduler
+        psadmin -p $action -d $domain
+        if [ "$action" != "start" ] && [ "$clearcache" = "Y" ]
+        then
+           echo Clearing $domain process scheduler cache
+           rm -r $PS_HOME/appserv/prcs/$domain/CACHE/*
+           echo Reconfiguring $domain
+           psadmin -p configure -d $domain
+        fi   
+     fi
+done
+
+#perform the action on the application server (if one is defined)
+cd <%= @cg_home %>/appserv
+for domain in $(find ./ -name psappsrv.cfg -print | grep -v Archive | cut -f 2 -d "/");do
+    if [ "X$domain" != "X" ]
+    then
+       if [ "$action" = "start" ] && [ "$clearcache" = "Y" ]
+       then
+          echo Clearing $domain application server cache
+          rm -r $PS_HOME/appserv/$domain/CACHE/*
+          echo Reconfiguring $domain
+          psadmin -c configure -d $domain
+       fi
+       echo "$action"ing $domain Application Server
+       psadmin -c $appsrv_action -d $domain
+       if [ "$action" != "start" ] && [ "$clearcache" = "Y" ]
+       then
+          echo Clearing $domain application server cache
+          rm -r $PS_HOME/appserv/$domain/CACHE/*
+          echo Reconfiguring $domain
+          psadmin -c configure -d $domain
+       fi   
+    fi
+done
+
+if [ -f $PIA/application/peoplesoft ]
+then
+for PIA in $(find $PS_HOME/webserv -name config.xml -print | sed "s/\/config.xml//");do
+    #perform the action on the web server (if one is installed)
+    if [ -d $PIA ]
+    then
+       if [ "$action" = "start" ] && [ "$clearcache" = "Y" ]
+       then
+          echo Clearing $domain web server cache
+          rm $PIA/applications/peoplesoft/PORTAL/$domain/cache/*
+       fi
+       echo "$action"ing $domain Web Server
+       cd $PIA
+       "$websrv_action"PIA.sh
+       if [ "$action" != "start" ] && [ "$clearcache" = "Y" ]
+       then
+          echo Clearing $domain web server cache
+          rm $PIA/applications/peoplesoft/PORTAL/$domain/cache/*
+       fi
+    fi
+done
+
+fi
+
+#Clean up IPCS if the kill option is specified
+if [ "X$action" = "Xkill" ] 
+then
+   echo "Cleaning up IPCS"
+   uid=`id | cut -f2 -d "(" | cut -f1 -d ")"`
+   grp=`id | cut -f3 -d "(" | cut -f1 -d ")"`
+   cd $PS_HOME/appserv
+   rm ./killipc.sh 2>/dev/null
+   ./ipcrmall.sh $uid $grp
+   ./killipc.sh
+fi
