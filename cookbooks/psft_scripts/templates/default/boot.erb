@@ -1,0 +1,13 @@
+#!/bin/sh
+export ORACLE_HOME=<%= @ora %>
+export LIBPATH=<%= @ora %>/lib:$PATH
+
+#tuxdir used to be set auto prior to 8.50, now it must be set manually
+
+export TUXDIR=<%= @ps_home %>/middleware/<%= @tux_dir %>
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:<%= @ps_home %>/<%= @app %>/<%= @env %>/bin:<%= @ps_home %>/middleware/<%= @tux_dir %>/bin:<%= @ora %>/lib:<%= @ps_home %>/middleware/<%= @tux_dir %>/bin:<%= @ora %>/bin:/home/tuxedo/bin
+export LD_LIBRARY_PATH=<%= @ps_home %>/<%= @app %>/<%= @env %>/bin/:<%= @ps_home %>/<%= @app %>/<%= @env %>/lib:<%= @ps_home %>/middleware/<%= @tux_dir %>/lib:<%= @ora %>/lib
+. <%= @ps_home %>/<%= @app %>/<%= @env %>/psconfig.sh
+
+echo "PeopleSoft App Server starting up domain <%= @domain %>"
+<%= @ps_home %>/<%= @app %>/<%= @env %>/bin/psadmin -c boot -d <%= @domain %>
