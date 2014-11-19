@@ -166,7 +166,6 @@ template "#{script_dir}/psft_jenkins_scripts/ps.sh" do
        mode 0755
        variables(
               :app => node['psft']['application'],
-              :domain => node['psft']['domain_name'],
               :env => node['psft']['environment'],
               :ps_home => node['psft']['home']
               )
