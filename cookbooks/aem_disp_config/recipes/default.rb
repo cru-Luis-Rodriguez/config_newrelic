@@ -21,7 +21,7 @@ elsif ["prod.dispatcher3"].include?(Chef::Config[:node_name])
 elsif ["prod.dispatcher4"].include?(Chef::Config[:node_name])
 	host_alias1 = "prod6dis4.cru.org"
 else
-	host_alias = "nil"
+	host_alias1 = "nil"
 end
 
 
