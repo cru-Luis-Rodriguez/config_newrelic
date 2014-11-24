@@ -12,9 +12,7 @@ suites:
   - name: test
     run_list:
        - recipe[config_newrelic::test]
-    attributes:
-
-  - name: default
-    run_list:
        - recipe[config_newrelic::default]
+    
     attributes:
+       
