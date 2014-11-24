@@ -11,6 +11,5 @@ platforms:
 suites:
   - name: default
     run_list:
-       - recipe[config_newrelic::test]
-       - recipe[config_newrelic::default]
+       - recipe[config_newrelic::test,config_newrelic::default]
     attributes:
