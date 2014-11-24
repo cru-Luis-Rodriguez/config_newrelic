@@ -9,7 +9,12 @@ platforms:
   - name: ubuntu-12.04
 
 suites:
+  - name: test
+    run_list:
+       - recipe[config_newrelic::test]
+    attributes:
+
   - name: default
     run_list:
-       - recipe[config_newrelic::test,config_newrelic::default]
+       - recipe[config_newrelic::default]
     attributes:
