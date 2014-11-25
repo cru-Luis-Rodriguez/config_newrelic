@@ -6,6 +6,8 @@
 #
 # All rights reserved - Do Not Redistribute
 #
+include_recipe "newrelic::default"
+include_recipe "tomcat:default"
 
 
 directory "/apps" do
