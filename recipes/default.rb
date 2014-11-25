@@ -14,6 +14,7 @@ directory "#{CAS_dir}/temp" do
     group "node['newrelic']['java_agent']['app_user']"
     mode "0755"
     action :create
+only_if { File.exist?("#{CAS_dir}") }
 end
 
 service 'tomcat-cas' do
@@ -28,6 +29,7 @@ template "#{CAS_dir}/bin/catalina.sh" do
               :default_env => node['newrelic']['java_agent']['environment']
               )
               notifies :restart, "service[tomcat-cas]", :immediately
+only_if { File.exist?("#{CAS_dir}/tomcat-cas/bin") }
 end
 
 
