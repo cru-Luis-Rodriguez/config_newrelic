@@ -14,6 +14,7 @@ directory "#{CAS_dir}/temp" do
     group "node['newrelic']['java_agent']['app_user']"
     mode "0755"
     action :create
+only_if { File.exist?("#{CAS_dir}") }
 end
 
 service 'tomcat-cas' do
