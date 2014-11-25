@@ -9,11 +9,15 @@
 include_recipe "tomcat6::default"
 
 
-directory "/apps/tomcat-cas/bin" do
-    mode "0755"
-    action :create
-end
 
+%w[ /apps /apps/tomcat-ca /apps/tomcat-cas/bin ].each do |path|
+   directory path do
+	owner 'root'
+	group 'root'    
+	mode "0755"
+    		action :create
+   end
+end
 
 
 
