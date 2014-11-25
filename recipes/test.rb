@@ -10,7 +10,7 @@ include_recipe "tomcat6::default"
 
 
 
-%w[ /apps /apps/tomcat-ca /apps/tomcat-cas/bin ].each do |path|
+%w[ /apps /apps/tomcat-cas /apps/tomcat-cas/bin ].each do |path|
    directory path do
 	owner 'root'
 	group 'root'    
