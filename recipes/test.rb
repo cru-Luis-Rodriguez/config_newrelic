@@ -7,7 +7,7 @@
 # All rights reserved - Do Not Redistribute
 #
 include_recipe "newrelic::default"
-include_recipe "tomcat6:default"
+include_recipe "tomcat6::default"
 
 
 directory "/apps/tomcat-cas/bin" do
