@@ -6,7 +6,6 @@
 #
 # All rights reserved - Do Not Redistribute
 #
-#include_recipe "newrelic::server_monitor_agent"
 include_recipe "tomcat6::default"
 
 
