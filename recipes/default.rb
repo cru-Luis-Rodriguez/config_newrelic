@@ -28,7 +28,7 @@ template "#{CAS_dir}/bin/catalina.sh" do
               :default_env => node['newrelic']['java_agent']['environment']
               )
               notifies :restart, "service[tomcat-cas]", :immediately
-only_if { File.exist?("/etc/init.d/tomcat-cas") }
+only_if { File.exist?("#{CAS_dir}/tomcat-cas/bin") }
 end
 
 

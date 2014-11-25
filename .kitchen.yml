@@ -11,6 +11,5 @@ platforms:
 suites:
   - name: test
     run_list:
-       - recipe[config_newrelic::test]
        - recipe[config_newrelic::default]
     attributes:
