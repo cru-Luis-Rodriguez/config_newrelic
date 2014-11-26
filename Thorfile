@@ -3,6 +3,8 @@
 require 'bundler'
 require 'bundler/setup'
 require 'berkshelf/thor'
+require 'thor/scmversion'
+require 'thor/foodcritic'
 
 begin
   require 'kitchen/thor_tasks'
@@ -10,3 +12,4 @@ begin
 rescue LoadError
   puts ">>>>> Kitchen gem not loaded, omitting tasks" unless ENV['CI']
 end
+
