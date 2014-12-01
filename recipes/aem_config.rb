@@ -26,7 +26,6 @@ service 'cqpublish' do
     provider Chef::Provider::Service::Init
 end
 
-if ["prod.publish1"].include?(Chef::Config[:node_name])
 	template "#{cq_dir}/publish/crx-quickstart/bin/start" do
     	source 'start_pub.erb'
         owner "cq"
@@ -36,10 +35,9 @@ if ["prod.publish1"].include?(Chef::Config[:node_name])
               	:default_env => node['newrelic']['java_agent']['environment']
               	)
               	notifies :restart, "service[cqpublish]", :immediately
+        only_if { ["prod.publish1"].include?(Chef::Config[:node_name]) }
 	end
-end
 
-if ["prod.publish2"].include?(Chef::Config[:node_name])
         template "#{cq_dir}/publish/crx-quickstart/bin/start" do
         source 'start_pub.erb'
         owner "cq"
@@ -49,10 +47,9 @@ if ["prod.publish2"].include?(Chef::Config[:node_name])
                 :default_env => node['newrelic']['java_agent']['environment']
                 )
                 notifies :restart, "service[cqpublish]", :immediately
+        only_if { ["prod.publish2"].include?(Chef::Config[:node_name]) }
         end
-end
 
-if ["prod.author"].include?(Chef::Config[:node_name])
 	template "#{cq_dir}/author/crx-quickstart/bin/start" do
     	source 'start_auth.erb'
         owner "cq"
@@ -62,5 +59,5 @@ if ["prod.author"].include?(Chef::Config[:node_name])
               	:default_env => node['newrelic']['java_agent']['environment']
               	)
               	notifies :restart, "service[cqauthor]", :immediately
+        only_if { ["prod.author"].include?(Chef::Config[:node_name]) }
 	end
-end
