@@ -6,4 +6,5 @@ default['newrelic']['java_agent']['environment']='nil'
 default['app']['install_path'] = "/opt"
 default['app']['name'] = "test"
 default['app']['template'] = "bin/test.sh"
+default['cq']['install_path'] = '/home/cq/cq'
 

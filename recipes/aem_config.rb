@@ -14,6 +14,7 @@ directory "#{cq_dir}/temp" do
     group "cq"
     mode "0755"
     action :create
+only_if { File.exist?("node['cq']['install_path']") }
 end
 
 service 'cqauthor' do
