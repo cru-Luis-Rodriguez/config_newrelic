@@ -9,10 +9,17 @@ platforms:
   - name: ubuntu-12.04
     driver_config:
         box: opscode-ubuntu-12.04
-        box_url: http://files.vagrantup.com/precise32.box
+#        box_url: http://files.vagrantup.com/precise32.box
 
 suites:
   - name: default
     run_list:
        - recipe[config_newrelic::default]
     attributes:
+
+suites:
+  - name: aem
+    run_list:
+       - recipe[config_newrelic::aem_config]
+    attributes:
+

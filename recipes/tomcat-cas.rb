@@ -8,27 +8,27 @@
 #
 
 
-directory "node['app']['install_path']/node['app']['name']"/temp" do
+directory "node['tomcat-cas']['install_path']/temp" do
     owner "node['newrelic']['java_agent']['app_user']"
     group "node['newrelic']['java_agent']['app_user']"
     mode "0755"
     action :create
-only_if { File.exist?("node['app']['install_path']/node['app']['name']") }
+only_if { File.exist?("node['tomcat-cas']['install_path']") }
 end
 
-service 'node['app']' do
+service 'tomcat-cas' do
     supports :status => true, :restart => true
     provider Chef::Provider::Service::Init
 end
 
-template "node['app']['install_path']/node['app']['name']/node['app']['template']" do
-    source 'node['app'][template].erb'
+template "node['tomcat-cas']['install_path']/bin/catalina.sh" do
+    source 'catalina.erb'
     mode 0755
     variables(
               :default_env => node['newrelic']['java_agent']['environment']
               )
-              notifies :restart, "service 'node['app']['name']", :immediately
-only_if { File.exist?("node['app']['install_path']/node['app']['name']") }
+              notifies :restart, "service[tomcat-cas]", :immediately
+only_if { File.exist?("node['tomcat-cas']['install_path']/tomcat-cas/bin") }
 end
 
 
