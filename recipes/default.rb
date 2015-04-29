@@ -8,7 +8,7 @@
 #
 
 
-directory "node['app']['install_path']/node['app']['name']"/temp" do
+directory "node['app']['install_path']/node['app']['name']/temp" do
     owner "node['newrelic']['java_agent']['app_user']"
     group "node['newrelic']['java_agent']['app_user']"
     mode "0755"
