@@ -40,7 +40,7 @@ fi
 
 # default JVM options
 if [ -z "$CQ_JVM_OPTS" ]; then
-	CQ_JVM_OPTS='-server -Xmx1024m -XX:MaxPermSize=256M -Djava.awt.headless=true -Dnewrelic.environment=<%= @default_env %> -javaagent:/home/cq/cq/newrelic/newrelic.jar'
+	CQ_JVM_OPTS='-server -Xmx3072m -XX:MaxPermSize=512M -Djava.awt.headless=true -Dnewrelic.environment=<%= @default_env %> -javaagent:/home/cq/cq/newrelic/newrelic.jar'
 fi
 
 # file size limit (ulimit)
