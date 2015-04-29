@@ -16,7 +16,7 @@ directory "node['app']['install_path']/node['app']['name']/temp" do
 only_if { File.exist?("node['app']['install_path']/node['app']['name']") }
 end
 
-service 'node['app']' do
+service "node['app']" do
     supports :status => true, :restart => true
     provider Chef::Provider::Service::Init
 end
